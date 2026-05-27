@@ -1,4 +1,4 @@
--- 1. Criação do Banco de Dados (opcional, caso você já não tenha um)
+-- 1. Criaï¿½ï¿½o do Banco de Dados (opcional, caso vocï¿½ jï¿½ nï¿½o tenha um)
 CREATE DATABASE DiskRisk;
 GO
 
@@ -7,17 +7,17 @@ GO
 
 ---
 
--- 2. Criação da Tabela de Usuários
+-- 2. Criaï¿½ï¿½o da Tabela de Usuï¿½rios
 CREATE TABLE Usuarios (
-    Id INT IDENTITY(1,1) NOT NULL, -- Incremento automático para o ID
+    Id INT IDENTITY(1,1) NOT NULL, -- Incremento automï¿½tico para o ID
     Nome VARCHAR(100) NOT NULL,
     Email VARCHAR(150) NOT NULL,
     Senha VARCHAR(255) NOT NULL,    -- Tamanho maior pensando em armazenamento de senhas criptografadas (Hash)
-    CEP CHAR(8) NOT NULL,           -- CHAR(8) é ideal para armazenar apenas os 8 números do CEP
+    CEP CHAR(8) NOT NULL,           -- CHAR(8) ï¿½ ideal para armazenar apenas os 8 nï¿½meros do CEP
     CPF CHAR(11) NULL,              -- Permitindo valor NULL conforme solicitado
     FotoPerfil NVARCHAR(MAX) NULL,   -- Armazena a URL da foto ou Base64
 
-    -- Definição das Restrições (Constraints)
+    -- Definiï¿½ï¿½o das Restriï¿½ï¿½es (Constraints)
     CONSTRAINT PK_Usuarios PRIMARY KEY (Id),
     CONSTRAINT UQ_Usuarios_Email UNIQUE (Email), -- Evita e-mails duplicados
     CONSTRAINT UQ_Usuarios_CPF UNIQUE (CPF)      -- Evita CPFs duplicados (quando preenchido)
@@ -25,36 +25,36 @@ CREATE TABLE Usuarios (
 GO
 
 
--- 3. Criação da Tabela de Denúncias
+-- 3. Criaï¿½ï¿½o da Tabela de Denï¿½ncias
 CREATE TABLE Denuncias (
     Id INT IDENTITY(1,1) NOT NULL,
-    UsuarioId INT NOT NULL,                     -- Vincula a denúncia ao usuário que a criou
-    CEP CHAR(8) NOT NULL,                       -- CHAR(8) é ideal para armazenar apenas os 8 números do CEP
+    UsuarioId INT NOT NULL,                     -- Vincula a denï¿½ncia ao usuï¿½rio que a criou
+    CEP CHAR(8) NOT NULL,                       -- CHAR(8) ï¿½ ideal para armazenar apenas os 8 nï¿½meros do CEP
     StatusDenuncia VARCHAR(20) NOT NULL,
-    TipoDenuncia VARCHAR(50) NOT NULL,          -- Ex: Assalto, Vandalismo, Iluminação pública
-    NivelRisco VARCHAR(20) NOT NULL,            -- Ex: Baixo, Médio, Alto
-    DataCriacao DATETIME DEFAULT GETDATE(),     -- Registra automaticamente a data/hora da denúncia
+    TipoDenuncia VARCHAR(50) NOT NULL,          -- Ex: Assalto, Vandalismo, Iluminaï¿½ï¿½o pï¿½blica
+    NivelRisco VARCHAR(20) NOT NULL,            -- Ex: Baixo, Mï¿½dio, Alto
+    DataCriacao DATETIME DEFAULT GETDATE(),     -- Registra automaticamente a data/hora da denï¿½ncia
     Descricao VARCHAR (200) NOT NULL,
     FotoDenuncia NVARCHAR(MAX) NULL,
 
-    -- Definição das Restrições (Constraints)
+    -- Definiï¿½ï¿½o das Restriï¿½ï¿½es (Constraints)
     CONSTRAINT PK_Denuncias PRIMARY KEY (Id),
     CONSTRAINT FK_Denuncias_Usuarios FOREIGN KEY (UsuarioId) REFERENCES Usuarios(Id) ON DELETE CASCADE
-    -- ON DELETE CASCADE garante que se um usuário for deletado, as denúncias dele também serão apagadas.
+    -- ON DELETE CASCADE garante que se um usuï¿½rio for deletado, as denï¿½ncias dele tambï¿½m serï¿½o apagadas.
 );
 GO
 
--- 2. Criação da Tabela de Governos
+-- 2. Criaï¿½ï¿½o da Tabela de Governos
 CREATE TABLE Instituicao (
-    Id INT IDENTITY(1,1) NOT NULL, -- Incremento automático para o ID
+    Id INT IDENTITY(1,1) NOT NULL, -- Incremento automï¿½tico para o ID
     Nome VARCHAR(100) NOT NULL,
     Email VARCHAR(150) NOT NULL,
     Senha VARCHAR(255) NOT NULL,    -- Tamanho maior pensando em armazenamento de senhas criptografadas (Hash)
-    CEP CHAR(8) NOT NULL,           -- CHAR(8) é ideal para armazenar apenas os 8 números do CEP
+    CEP CHAR(8) NOT NULL,           -- CHAR(8) ï¿½ ideal para armazenar apenas os 8 nï¿½meros do CEP
     CPF CHAR(11) NULL,              -- Permitindo valor NULL conforme solicitado
     FotoPerfil NVARCHAR(MAX) NULL,   -- Armazena a URL da foto ou Base64
 
-    -- Definição das Restrições (Constraints)
+    -- Definiï¿½ï¿½o das Restriï¿½ï¿½es (Constraints)
     CONSTRAINT PK_Instituicao PRIMARY KEY (Id),
     CONSTRAINT UQ_Instituicao_Email UNIQUE (Email), -- Evita e-mails duplicados
     CONSTRAINT UQ_Instituicao_CPF UNIQUE (CPF)      -- Evita CPFs duplicados (quando preenchido)

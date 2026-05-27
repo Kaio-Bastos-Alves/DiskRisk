@@ -3,6 +3,10 @@ package com.DiskRisk.demo.controller;
 import com.DiskRisk.demo.model.Denuncia;
 import com.DiskRisk.demo.service.DenunciaService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.validation.BindingResult;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +17,7 @@ import java.util.List;
 public class DenunciaController {
 
     private final DenunciaService service;
+    private static final Logger logger = LoggerFactory.getLogger(DenunciaController.class);
 
     public DenunciaController(DenunciaService service) {
         this.service = service;
@@ -51,10 +56,22 @@ public class DenunciaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> criar(@Valid @RequestBody Denuncia denuncia) {
+    public ResponseEntity<?> criar(@Valid @RequestBody Denuncia denuncia, BindingResult br) {
+        // Se houver erros de validação dos campos (@NotBlank, @Size, @NotNull, etc) devolve detalhes
+        if (br.hasErrors()) {
+            String msg = br.getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+            logger.warn("Validação inválida ao criar denúncia: {}", msg);
+            return ResponseEntity.badRequest().body(msg);
+        }
+
+        // Log do payload recebido para ajudar debug (confirme que usuarioId está correto)
+        logger.info("Recebendo requisição criar denúncia: {}", denuncia);
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(denuncia));
         } catch (RuntimeException e) {
+            logger.warn("Erro ao criar denúncia: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

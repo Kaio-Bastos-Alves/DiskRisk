@@ -21,9 +21,23 @@ const NIVEIS = [
   { value: "low",    label: "Baixo — Monitoramento",         color: "#22c55e", icon: "bi-info-circle-fill" },
 ];
 
+// Mapas para enviar valores compatíveis com o backend (português)
+const TIPO_MAP: Record<string, string> = {
+  flood: "Enchente",
+  landslide: "Desabamento/Deslizamento",
+  storm: "Chuva forte/Tempestade",
+  other: "Outro",
+};
+const NIVEIS_MAP: Record<string, string> = {
+  high: "Alto",
+  medium: "Médio",
+  low: "Baixo",
+};
+
 export default function Report() {
   const navigate = useNavigate();
-  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  // Retorna null quando não há user salvo, evita objeto vazio sem id
+  const user = JSON.parse(sessionStorage.getItem("user") || "null");
   const [form, setForm] = useState<FormData>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,16 +49,49 @@ export default function Report() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.tipoDenuncia || !form.cep || !form.descricao || !form.nivelRisco) {
-      setError("Preencha todos os campos obrigatórios."); return;
+      setError("Preencha todos os campos obrigatórios.");
+      return;
     }
-    if (form.cep.replace(/\D/g, "").length !== 8) { setError("CEP deve ter 8 dígitos."); return; }
-    setError(null); setLoading(true);
+    const cepDigits = form.cep.replace(/\D/g, "");
+    if (cepDigits.length !== 8) {
+      setError("CEP deve ter 8 dígitos.");
+      return;
+    }
+
+    // UsuarioId é obrigatório conforme schema do banco (NOT NULL)
+    if (!user || typeof user.id !== "number") {
+      setError("É necessário fazer login para enviar uma denúncia.");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
     try {
-      await api.criarDenuncia({ tipoDenuncia: form.tipoDenuncia, cep: form.cep.replace(/\D/g, ""), descricao: form.descricao, nivelRisco: form.nivelRisco, statusDenuncia: "pendente", usuarioId: user.tipo === "morador" ? user.id : null });
+      const payload = {
+        // names must match entity properties: tipoDenuncia, cep, descricao, nivelRisco, statusDenuncia, usuarioId
+        tipoDenuncia: TIPO_MAP[form.tipoDenuncia] || form.tipoDenuncia,
+        cep: cepDigits,
+        descricao: form.descricao,
+        nivelRisco: NIVEIS_MAP[form.nivelRisco] || form.nivelRisco,
+        statusDenuncia: "pendente",
+        // foto é opcional no banco — enviar explicitamente null para deixar claro
+        fotoDenuncia: null,
+        usuarioId: user.id
+      };
+
+      // ajuda a confirmar exatamente o que será enviado ao backend
+      console.log("Payload criarDenuncia:", payload);
+
+      await api.criarDenuncia(payload);
       setSubmitted(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Erro ao enviar.");
-    } finally { setLoading(false); }
+      // tenta extrair mensagem do corpo da resposta (axios/fetch compatível)
+      const msg = (err as any)?.response?.data || (err as any)?.message || "Erro ao enviar.";
+      console.error("Erro criarDenuncia:", err);
+      setError(typeof msg === "string" ? msg : JSON.stringify(msg));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) return (
