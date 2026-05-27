@@ -171,8 +171,13 @@ export default function Home() {
             const color = SEV_COLOR[risk] || "#64748b";
             return (
               <div key={pin.id}>
-                <Circle center={[pin.lat, pin.lng]} radius={SEV_RADIUS[risk] || 400} pathOptions={{ color, fillColor: color, fillOpacity: 0.15, weight: 2, opacity: 0.7, dashArray: normalize(pin.statusDenuncia) === "resolvido" ? "6 4" : undefined }} eventHandlers={{ click: () => setSelected(pin) }} />
-                <Marker position={[pin.lat, pin.lng]} icon={makeIcon(color, pin.fotoDenuncia)} eventHandlers={{ click: () => setSelected(pin) }}>
+                <Circle center={[pin.lat, pin.lng]} radius={SEV_RADIUS[risk] || 400} pathOptions={{ color, fillColor: color, fillOpacity: 0.15, weight: 2, opacity: 0.7, dashArray: normalize(pin.statusDenuncia) === "resolvido" ? "6 4" : undefined }} eventHandlers={{ click: () => navigate(`/denuncia/${pin.id}`) }} />
+                <Marker
+                  position={[pin.lat, pin.lng]}
+                  icon={makeIcon(color, pin.fotoDenuncia)}
+                  eventHandlers={{ click: () => navigate(`/denuncia/${pin.id}`) }}
+                  title={`Denuncia #${pin.id} - CEP ${pin.cep}`}
+                >
                   <Popup>
                     <div style={{ fontFamily: "'Nunito', sans-serif", minWidth: 200 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
@@ -224,7 +229,7 @@ export default function Home() {
             const color = SEV_COLOR[risk] || "#64748b";
             const active = selected?.id === denuncia.id;
             return (
-              <div key={denuncia.id} style={{ background: active ? P.cream : "rgba(42,18,40,0.85)", borderRadius: 10, padding: "10px 13px", cursor: "pointer", borderLeft: `4px solid ${color}`, border: `1px solid ${active ? color : "rgba(255,255,255,0.06)"}`, borderLeftWidth: 4, transition: "all 0.18s" }} onClick={() => pin ? setSelected(active ? null : pin) : navigate(`/denuncia/${denuncia.id}`)}>
+              <div key={denuncia.id} style={{ background: active ? P.cream : "rgba(42,18,40,0.85)", borderRadius: 10, padding: "10px 13px", cursor: "pointer", borderLeft: `4px solid ${color}`, border: `1px solid ${active ? color : "rgba(255,255,255,0.06)"}`, borderLeftWidth: 4, transition: "all 0.18s" }} onClick={() => navigate(`/denuncia/${denuncia.id}`)}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <i className={`bi ${TYPE_ICON[type] || TYPE_ICON.other}`} style={{ color, fontSize: 13 }} />

@@ -5,9 +5,16 @@ async function request(path, options = {}) {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
-  const data = await res.json().catch(() => ({}));
+  const text = await res.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = text;
+  }
   if (!res.ok) {
     const msg =
+      (typeof data === "string" ? data : null) ||
       data.erro ||
       data.message ||
       (Array.isArray(data.errors) ? data.errors.map((e) => e.defaultMessage).join(", ") : null) ||

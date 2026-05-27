@@ -42,7 +42,7 @@ public class Denuncia {
     @Column(name = "NivelRisco", nullable = false, length = 20)
     private String nivelRisco;
 
-    @Column(name = "DataCriacao", nullable = false, insertable = false, updatable = false)
+    @Column(name = "DataCriacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
     @NotBlank
@@ -52,6 +52,19 @@ public class Denuncia {
 
     @Column(name = "FotoDenuncia", columnDefinition = "NVARCHAR(MAX)")
     private String fotoDenuncia;
+
+    @PrePersist
+    public void prePersist() {
+        if (dataCriacao == null) {
+            dataCriacao = LocalDateTime.now();
+        }
+        if (statusDenuncia == null || statusDenuncia.isBlank()) {
+            statusDenuncia = "pendente";
+        }
+        if (cep != null) {
+            cep = cep.replaceAll("\\D", "");
+        }
+    }
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -72,5 +85,5 @@ public class Denuncia {
     public String getFotoDenuncia() { return fotoDenuncia; }
     public void setFotoDenuncia(String f) { this.fotoDenuncia = f; }
 
-    // DataCriacao é preenchida pelo banco (DEFAULT GETDATE()), por isso não é inserida/atualizada pelo Hibernate.
+    // DataCriacao e statusDenuncia sao preenchidos antes do insert para funcionar mesmo sem DEFAULT no banco.
 }
