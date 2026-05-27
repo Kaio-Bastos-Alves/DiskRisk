@@ -47,4 +47,16 @@ export const api = {
     request("/denuncias", { method: "POST", body: JSON.stringify(dados) }),
   atualizarStatus: (id, status) =>
     request(`/denuncias/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+
+  // Geocodificação de CEP → coordenadas via ViaCEP + Nominatim
+  geocodificarCep: async (cep) => {
+    const via = await fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r => r.json());
+    if (via.erro) throw new Error("CEP não encontrado");
+    const query = encodeURIComponent(`${via.logradouro || ''} ${via.bairro}, ${via.localidade}, ${via.uf}, Brasil`);
+    const nom = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
+      headers: { "Accept-Language": "pt-BR" }
+    }).then(r => r.json());
+    if (!nom.length) throw new Error("Coordenadas não encontradas");
+    return { lat: parseFloat(nom[0].lat), lng: parseFloat(nom[0].lon), cidade: via.localidade, bairro: via.bairro };
+  },
 };

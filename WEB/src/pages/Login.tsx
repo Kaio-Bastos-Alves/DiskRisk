@@ -6,13 +6,7 @@ import logo from "../assets/logohakc.png";
 type Perfil = "morador" | "instituicao" | null;
 type CepStatus = "incompleto" | "loading" | "ok" | "erro" | null;
 
-const P = {
-  dark: "#1f0a1d",
-  teal: "#334f53",
-  green: "#45936c",
-  lime: "#9acc77",
-  cream: "#e5ead4",
-};
+const P = { dark: "#1f0a1d", teal: "#334f53", green: "#45936c", lime: "#9acc77", cream: "#e5ead4" };
 
 export default function Login() {
   const navigate = useNavigate();
@@ -57,16 +51,9 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      let user;
-      if (modo === "login") {
-        user = perfil === "morador"
-          ? await api.loginMorador(form.email, form.senha)
-          : await api.loginInstituicao(form.email, form.senha);
-      } else {
-        user = perfil === "morador"
-          ? await api.cadastroMorador(form)
-          : await api.cadastroInstituicao(form);
-      }
+      const user = modo === "login"
+        ? perfil === "morador" ? await api.loginMorador(form.email, form.senha) : await api.loginInstituicao(form.email, form.senha)
+        : perfil === "morador" ? await api.cadastroMorador(form) : await api.cadastroInstituicao(form);
       sessionStorage.setItem("user", JSON.stringify(user));
       navigate("/home");
     } catch (err: unknown) {
@@ -82,214 +69,157 @@ export default function Login() {
     setCepStatus(null); setCepInfo(null);
   };
 
-  const cepFieldClass = `dr-field${cepStatus === "erro" || cepStatus === "incompleto" ? " dr-field-err" : cepStatus === "ok" ? " dr-field-ok" : ""}`;
+  const cepFieldClass = `field${cepStatus === "erro" || cepStatus === "incompleto" ? " error" : cepStatus === "ok" ? " success" : ""}`;
 
   return (
-    <div className="dr-page">
-      <div className="dr-card">
-        <div className="dr-logo">
-          <img src={logo} alt="DiskRisk" style={{ height: 56, objectFit: "contain" }} />
+    <div style={{ minHeight: "100vh", display: "flex", background: `linear-gradient(145deg, ${P.dark} 0%, #2d1a2b 40%, ${P.teal} 100%)`, fontFamily: "'Nunito', sans-serif" }}>
+      {/* Left panel — decorativo */}
+      <div className="hide-mobile" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 48, gap: 32 }}>
+        <img src={logo} alt="DiskRisk" style={{ height: 80, objectFit: "contain" }} />
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{ color: P.lime, fontSize: 32, fontWeight: 800, margin: "0 0 12px", lineHeight: 1.2 }}>Proteja sua<br />comunidade</h1>
+          <p style={{ color: P.cream, opacity: 0.6, fontSize: 15, lineHeight: 1.7, maxWidth: 280 }}>
+            Reporte desastres, acompanhe riscos em tempo real e ajude a salvar vidas na sua região.
+          </p>
         </div>
-
-        {!perfil ? (
-          <>
-            <p className="dr-subtitle">Como você quer entrar?</p>
-            <div className="dr-profile-grid">
-              <button className="dr-profile-btn" onClick={() => setPerfil("morador")}>
-                <i className="bi bi-house-fill" />
-                <span>Morador</span>
-                <small>Reporte riscos na sua região</small>
-              </button>
-              <button className="dr-profile-btn" onClick={() => setPerfil("instituicao")}>
-                <i className="bi bi-building-fill" />
-                <span>Instituição</span>
-                <small>Gerencie alertas e denúncias</small>
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="dr-back" onClick={voltar}>
-              <i className="bi bi-arrow-left" /> Voltar
-            </div>
-
-            <div className="dr-perfil-badge">
-              <i className={`bi ${perfil === "morador" ? "bi-house-fill" : "bi-building-fill"}`} />
-              {perfil === "morador" ? "Morador" : "Instituição"}
-            </div>
-
-            <div className="dr-tabs">
-              <button className={modo === "login" ? "active" : ""} onClick={() => { setModo("login"); setErro(null); }}>
-                <i className="bi bi-box-arrow-in-right" /> Entrar
-              </button>
-              <button className={modo === "cadastro" ? "active" : ""} onClick={() => { setModo("cadastro"); setErro(null); }}>
-                <i className="bi bi-person-plus-fill" /> Cadastrar
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="dr-form">
-              {modo === "cadastro" && (
-                <div className="dr-field">
-                  <i className="bi bi-person-fill" />
-                  <input placeholder="Nome completo" value={form.nome} onChange={set("nome")} required />
-                </div>
-              )}
-
-              <div className="dr-field">
-                <i className="bi bi-envelope-fill" />
-                <input type="email" placeholder="E-mail" value={form.email} onChange={set("email")} required />
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: 280 }}>
+          {[
+            { icon: "bi-geo-alt-fill",        text: "Mapeamento de riscos em tempo real" },
+            { icon: "bi-megaphone-fill",       text: "Denúncias diretas para autoridades"  },
+            { icon: "bi-shield-check-fill",    text: "Alertas para sua região"             },
+          ].map((f) => (
+            <div key={f.text} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: "12px 16px", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${P.green}, ${P.lime})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <i className={`bi ${f.icon}`} style={{ color: P.dark, fontSize: 16 }} />
               </div>
-
-              <div className="dr-field">
-                <i className="bi bi-lock-fill" />
-                <input type="password" placeholder="Senha (mín. 6 caracteres)" value={form.senha} onChange={set("senha")} required minLength={6} />
-              </div>
-
-              {modo === "cadastro" && (
-                <>
-                  <div className={cepFieldClass}>
-                    <i className="bi bi-geo-alt-fill" />
-                    <input placeholder="CEP (8 dígitos)" value={form.cep} onChange={handleCep} required inputMode="numeric" />
-                    {cepStatus === "loading" && <i className="bi bi-hourglass-split dr-cep-icon spin" />}
-                    {cepStatus === "ok" && <i className="bi bi-check-circle-fill dr-cep-icon" style={{ color: P.green }} />}
-                    {(cepStatus === "erro" || cepStatus === "incompleto") && <i className="bi bi-x-circle-fill dr-cep-icon" style={{ color: "#b91c1c" }} />}
-                  </div>
-                  {cepStatus === "ok" && cepInfo && (
-                    <div className="dr-cep-info"><i className="bi bi-map" /> {cepInfo}</div>
-                  )}
-                  {cepStatus === "erro" && (
-                    <div className="dr-cep-hint err"><i className="bi bi-exclamation-circle" /> CEP não encontrado.</div>
-                  )}
-                  {cepStatus === "incompleto" && (
-                    <div className="dr-cep-hint err"><i className="bi bi-exclamation-circle" /> CEP deve ter 8 dígitos.</div>
-                  )}
-                  <div className="dr-field">
-                    <i className="bi bi-card-text" />
-                    <input placeholder="CPF (11 dígitos, opcional)" value={form.cpf} onChange={set("cpf")} maxLength={11} inputMode="numeric" />
-                  </div>
-                </>
-              )}
-
-              {erro && (
-                <div className="dr-erro">
-                  <i className="bi bi-exclamation-triangle-fill" /> {erro}
-                </div>
-              )}
-
-              <button type="submit" className="dr-submit" disabled={loading}>
-                {loading
-                  ? <><i className="bi bi-hourglass-split" /> Aguarde...</>
-                  : modo === "login"
-                    ? <><i className="bi bi-box-arrow-in-right" /> Entrar</>
-                    : <><i className="bi bi-person-check-fill" /> Criar conta</>
-                }
-              </button>
-            </form>
-          </>
-        )}
+              <span style={{ color: P.cream, fontSize: 13, fontWeight: 600, opacity: 0.85 }}>{f.text}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <style>{`
-        .dr-page {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, ${P.dark} 0%, ${P.teal} 60%, ${P.green} 100%);
-          padding: 20px;
-          font-family: 'Nunito', sans-serif;
-        }
-        .dr-card {
-          background: ${P.cream};
-          border-radius: 20px;
-          padding: 36px 32px;
-          width: 100%;
-          max-width: 420px;
-          box-shadow: 0 24px 60px rgba(0,0,0,0.35);
-        }
-        .dr-logo {
-          display: flex; align-items: center; gap: 10px; justify-content: center;
-          margin-bottom: 8px; color: ${P.dark}; font-size: 28px; font-weight: 800;
-        }
-        .dr-logo i { font-size: 32px; color: ${P.green}; }
-        .dr-subtitle { text-align: center; color: ${P.teal}; font-size: 15px; margin: 0 0 24px; font-weight: 600; }
-        .dr-profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .dr-profile-btn {
-          display: flex; flex-direction: column; align-items: center; gap: 6px;
-          padding: 24px 16px; border: 2px solid transparent; border-radius: 14px;
-          background: white; cursor: pointer; transition: all 0.2s; color: ${P.dark};
-        }
-        .dr-profile-btn i { font-size: 36px; color: ${P.green}; }
-        .dr-profile-btn span { font-size: 16px; font-weight: 700; }
-        .dr-profile-btn small { font-size: 11px; color: ${P.teal}; text-align: center; }
-        .dr-profile-btn:hover {
-          border-color: ${P.green}; background: ${P.lime}22;
-          transform: translateY(-2px); box-shadow: 0 8px 20px rgba(69,147,108,0.2);
-        }
-        .dr-back {
-          display: inline-flex; align-items: center; gap: 6px;
-          color: ${P.teal}; font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 12px;
-        }
-        .dr-back:hover { color: ${P.green}; }
-        .dr-perfil-badge {
-          display: inline-flex; align-items: center; gap: 6px;
-          background: ${P.green}; color: white; border-radius: 20px;
-          padding: 4px 14px; font-size: 13px; font-weight: 700; margin-bottom: 16px;
-        }
-        .dr-tabs {
-          display: flex; border-radius: 10px; overflow: hidden;
-          border: 2px solid ${P.green}; margin-bottom: 20px;
-        }
-        .dr-tabs button {
-          flex: 1; padding: 10px; border: none; background: transparent;
-          color: ${P.teal}; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
-          cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;
-        }
-        .dr-tabs button.active { background: ${P.green}; color: white; }
-        .dr-form { display: flex; flex-direction: column; gap: 12px; }
-        .dr-field {
-          display: flex; align-items: center; gap: 10px; background: white;
-          border: 1.5px solid #ddd; border-radius: 10px; padding: 0 14px; transition: border-color 0.2s;
-        }
-        .dr-field:focus-within { border-color: ${P.green}; }
-        .dr-field-ok { border-color: ${P.green} !important; }
-        .dr-field-err { border-color: #f87171 !important; }
-        .dr-field i { color: ${P.green}; font-size: 16px; flex-shrink: 0; }
-        .dr-field input {
-          flex: 1; border: none; outline: none; padding: 12px 0;
-          font-family: 'Nunito', sans-serif; font-size: 14px; color: ${P.dark}; background: transparent;
-        }
-        .dr-field input::placeholder { color: #aaa; }
-        .dr-cep-icon { font-size: 16px; flex-shrink: 0; }
-        .spin { animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .dr-cep-info {
-          font-size: 12px; color: ${P.green}; font-weight: 600;
-          display: flex; align-items: center; gap: 5px; margin-top: -6px; padding: 0 4px;
-        }
-        .dr-cep-hint {
-          font-size: 12px; display: flex; align-items: center; gap: 5px; margin-top: -6px; padding: 0 4px;
-        }
-        .dr-cep-hint.err { color: #b91c1c; }
-        .dr-erro {
-          background: #fff0f0; border: 1px solid #fca5a5; color: #b91c1c;
-          border-radius: 8px; padding: 10px 14px; font-size: 13px;
-          display: flex; align-items: center; gap: 8px;
-        }
-        .dr-submit {
-          background: linear-gradient(135deg, ${P.green}, ${P.lime});
-          color: ${P.dark}; border: none; border-radius: 10px; padding: 13px;
-          font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
-          cursor: pointer; display: flex; align-items: center; justify-content: center;
-          gap: 8px; transition: opacity 0.2s, transform 0.2s; margin-top: 4px;
-        }
-        .dr-submit:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-        .dr-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-        @media (max-width: 480px) {
-          .dr-card { padding: 28px 20px; }
-          .dr-profile-grid { grid-template-columns: 1fr; }
-        }
-      `}</style>
+      {/* Right panel — form */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px", flex: "0 0 auto", width: "100%", maxWidth: 460 }}>
+        <div style={{ background: P.cream, borderRadius: 24, padding: "36px 32px", width: "100%", boxShadow: "0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)" }}>
+
+          {/* Logo mobile */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+            <img src={logo} alt="DiskRisk" style={{ height: 48, objectFit: "contain" }} />
+          </div>
+
+          {!perfil ? (
+            <>
+              <h2 style={{ textAlign: "center", color: P.dark, fontWeight: 800, fontSize: 20, margin: "0 0 6px" }}>Bem-vindo de volta</h2>
+              <p style={{ textAlign: "center", color: P.teal, fontSize: 14, margin: "0 0 28px" }}>Como você quer acessar?</p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  { key: "morador",    icon: "bi-house-fill",    title: "Morador",    sub: "Reporte riscos na sua região" },
+                  { key: "instituicao", icon: "bi-building-fill", title: "Instituição", sub: "Gerencie alertas e denúncias" },
+                ].map((p) => (
+                  <button key={p.key} onClick={() => setPerfil(p.key as Perfil)}
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "22px 14px", border: `2px solid transparent`, borderRadius: 16, background: "white", cursor: "pointer", transition: "all 0.2s", color: P.dark, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = P.green; (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-3px)"; (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 8px 24px rgba(69,147,108,0.2)`; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "transparent"; (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 12px rgba(0,0,0,0.08)"; }}
+                  >
+                    <div style={{ width: 52, height: 52, borderRadius: 16, background: `linear-gradient(135deg, ${P.green}, ${P.lime})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <i className={`bi ${p.icon}`} style={{ fontSize: 24, color: P.dark }} />
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 800 }}>{p.title}</span>
+                    <span style={{ fontSize: 11, color: P.teal, textAlign: "center", lineHeight: 1.4 }}>{p.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <button className="back-btn" onClick={voltar} style={{ color: P.teal }}>
+                <i className="bi bi-arrow-left" /> Voltar
+              </button>
+
+              {/* Perfil badge */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: `linear-gradient(135deg, ${P.green}, ${P.lime})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <i className={`bi ${perfil === "morador" ? "bi-house-fill" : "bi-building-fill"}`} style={{ fontSize: 18, color: P.dark }} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, color: P.dark, fontSize: 16 }}>{perfil === "morador" ? "Morador" : "Instituição"}</div>
+                  <div style={{ fontSize: 12, color: P.teal }}>Acesso {perfil === "morador" ? "pessoal" : "institucional"}</div>
+                </div>
+              </div>
+
+              {/* Tabs */}
+              <div style={{ display: "flex", background: "#f0f0e8", borderRadius: 12, padding: 4, marginBottom: 22, gap: 4 }}>
+                {(["login", "cadastro"] as const).map((m) => (
+                  <button key={m} onClick={() => { setModo(m); setErro(null); }}
+                    style={{ flex: 1, padding: "9px", border: "none", borderRadius: 9, fontFamily: "'Nunito', sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                      background: modo === m ? "white" : "transparent",
+                      color: modo === m ? P.dark : P.teal,
+                      boxShadow: modo === m ? "0 2px 8px rgba(0,0,0,0.1)" : "none",
+                    }}>
+                    <i className={`bi ${m === "login" ? "bi-box-arrow-in-right" : "bi-person-plus-fill"}`} />
+                    {m === "login" ? "Entrar" : "Cadastrar"}
+                  </button>
+                ))}
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+                {modo === "cadastro" && (
+                  <div className="field">
+                    <i className="bi bi-person-fill" />
+                    <input placeholder="Nome completo" value={form.nome} onChange={set("nome")} required />
+                  </div>
+                )}
+                <div className="field">
+                  <i className="bi bi-envelope-fill" />
+                  <input type="email" placeholder="E-mail" value={form.email} onChange={set("email")} required />
+                </div>
+                <div className="field">
+                  <i className="bi bi-lock-fill" />
+                  <input type="password" placeholder={modo === "cadastro" ? "Senha (mín. 6 caracteres)" : "Senha"} value={form.senha} onChange={set("senha")} required minLength={6} />
+                </div>
+
+                {modo === "cadastro" && (
+                  <>
+                    <div className={cepFieldClass}>
+                      <i className="bi bi-geo-alt-fill" />
+                      <input placeholder="CEP (8 dígitos)" value={form.cep} onChange={handleCep} required inputMode="numeric" />
+                      {cepStatus === "loading" && <i className="bi bi-hourglass-split spin" style={{ color: P.teal, fontSize: 15 }} />}
+                      {cepStatus === "ok"      && <i className="bi bi-check-circle-fill"  style={{ color: P.green, fontSize: 15 }} />}
+                      {(cepStatus === "erro" || cepStatus === "incompleto") && <i className="bi bi-x-circle-fill" style={{ color: "#ef4444", fontSize: 15 }} />}
+                    </div>
+                    {cepStatus === "ok" && cepInfo && (
+                      <div style={{ fontSize: 12, color: P.green, fontWeight: 600, display: "flex", alignItems: "center", gap: 5, padding: "0 4px", marginTop: -4 }}>
+                        <i className="bi bi-map-fill" /> {cepInfo}
+                      </div>
+                    )}
+                    {(cepStatus === "erro" || cepStatus === "incompleto") && (
+                      <div style={{ fontSize: 12, color: "#b91c1c", display: "flex", alignItems: "center", gap: 5, padding: "0 4px", marginTop: -4 }}>
+                        <i className="bi bi-exclamation-circle-fill" />
+                        {cepStatus === "erro" ? "CEP não encontrado." : "CEP deve ter 8 dígitos."}
+                      </div>
+                    )}
+                    <div className="field">
+                      <i className="bi bi-card-text" />
+                      <input placeholder="CPF (11 dígitos, opcional)" value={form.cpf} onChange={set("cpf")} maxLength={11} inputMode="numeric" />
+                    </div>
+                  </>
+                )}
+
+                {erro && <div className="alert alert-error"><i className="bi bi-exclamation-triangle-fill" /> {erro}</div>}
+
+                <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: 4, padding: "13px", fontSize: 15, borderRadius: 12 }}>
+                  {loading
+                    ? <><i className="bi bi-hourglass-split spin" /> Aguarde...</>
+                    : modo === "login"
+                      ? <><i className="bi bi-box-arrow-in-right" /> Entrar</>
+                      : <><i className="bi bi-person-check-fill" /> Criar conta</>
+                  }
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

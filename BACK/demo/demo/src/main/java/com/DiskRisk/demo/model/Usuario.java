@@ -1,10 +1,12 @@
 package com.DiskRisk.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "Usuarios")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Usuario {
 
     @Id

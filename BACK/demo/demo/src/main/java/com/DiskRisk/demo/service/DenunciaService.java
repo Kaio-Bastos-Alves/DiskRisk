@@ -67,7 +67,6 @@ public class DenunciaService {
         denuncia.setTipoDenuncia(dados.getTipoDenuncia());
         denuncia.setNivelRisco(dados.getNivelRisco());
         denuncia.setDescricao(dados.getDescricao());
-        denuncia.setFotoDenuncia(dados.getFotoDenuncia());
         return repository.save(denuncia);
     }
 
