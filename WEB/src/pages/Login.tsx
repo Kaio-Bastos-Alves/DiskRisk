@@ -72,9 +72,9 @@ export default function Login() {
   const cepFieldClass = `field${cepStatus === "erro" || cepStatus === "incompleto" ? " error" : cepStatus === "ok" ? " success" : ""}`;
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: `linear-gradient(145deg, ${P.dark} 0%, #2d1a2b 40%, ${P.teal} 100%)`, fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", gap: 36, padding: "32px 20px", background: `linear-gradient(145deg, ${P.dark} 0%, #2d1a2b 40%, ${P.teal} 100%)`, fontFamily: "'Nunito', sans-serif" }}>
       {/* Left panel — decorativo */}
-      <div className="hide-mobile" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 48, gap: 32 }}>
+      <div className="hide-mobile" style={{ flex: "1 1 420px", maxWidth: 460, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, gap: 32 }}>
         <img src={logo} alt="DiskRisk" style={{ height: 80, objectFit: "contain" }} />
         <div style={{ textAlign: "center" }}>
           <h1 style={{ color: P.lime, fontSize: 32, fontWeight: 800, margin: "0 0 12px", lineHeight: 1.2 }}>Proteja sua<br />comunidade</h1>
@@ -99,7 +99,7 @@ export default function Login() {
       </div>
 
       {/* Right panel — form */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px", flex: "0 0 auto", width: "100%", maxWidth: 460 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flex: "1 1 420px", width: "100%", maxWidth: 460 }}>
         <div style={{ background: P.cream, borderRadius: 24, padding: "36px 32px", width: "100%", boxShadow: "0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)" }}>
 
           {/* Logo mobile */}
